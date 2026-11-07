@@ -3,60 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام إرسال علامات الطلاب</title>
+    <title>نظام رصد علامات الطلاب الاحترافي</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#059669">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        /* تحسين التمرير وحجم الخطوط للهواتف */
         input, select, textarea {
-            font-size: 16px !important; /* يمنع التكبير التلقائي المزعج في آيفون وأندرويد */
+            font-size: 16px !important;
+        }
+        @media print {
+            body {
+                background-color: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+            }
+            .print-table th, .print-table td {
+                border: 1px solid #64748b !important;
+                padding: 6px !important;
+            }
+            .print-header {
+                display: block !important;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            input, select {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                text-align: center;
+            }
+        }
+        .print-header {
+            display: none;
         }
     </style>
 </head>
-<body class="bg-slate-100 font-sans min-h-screen p-2 sm:p-4">
-    <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <!-- Header -->
-        <div class="bg-emerald-600 text-white p-4 sm:p-5">
-            <h1 class="text-lg sm:text-xl font-bold">📊 رصد علامات الطلاب</h1>
-            <p class="text-emerald-100 text-xs sm:text-sm mt-0.5">الصف الرابع الابتدائي - واتساب</p>
+<body class="bg-gradient-to-br from-slate-50 to-emerald-50 font-sans min-h-screen p-2 sm:p-6">
+    <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden p-4 sm:p-6">
+        
+        <!-- ترويسة ملف الـ PDF -->
+        <div class="print-header">
+            <h2 class="text-xl font-extrabold text-slate-800">سجل علامات الطلاب المدرسي</h2>
+            <p id="pdfHeaderMeta" class="text-xs text-slate-600 mt-1"></p>
+            <hr class="my-3 border-slate-200">
         </div>
 
-        <div class="p-3 sm:p-5 space-y-4">
-            <!-- Controls Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <!-- Header -->
+        <div class="no-print bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-5 rounded-2xl shadow-md mb-5">
+            <div class="flex justify-between items-center">
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">المادة الدراسية</label>
-                    <input type="text" id="subject" placeholder="مثال: رياضيات" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                    <h1 class="text-lg sm:text-xl font-bold">🌟 نظام رصد العلامات المتطور</h1>
+                    <p class="text-emerald-100 text-xs mt-1">الصف الرابع الابتدائي - إشراف تربوي</p>
                 </div>
+                <button onclick="resetData()" class="bg-emerald-800/60 hover:bg-emerald-800 text-emerald-100 text-xs px-3 py-1.5 rounded-xl transition">
+                    🔄 إعادة ضبط
+                </button>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <!-- Controls Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 no-print bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">نوع التقييم</label>
-                    <select id="evalType" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
-                        <option value="مذاكرة">مذاكرة</option>
-                        <option value="امتحان">امتحان</option>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">المادة الدراسية</label>
+                    <select id="subject" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium text-slate-800">
+                        <option value="اللغة العربية">اللغة العربية</option>
+                        <option value="الرياضيات">الرياضيات</option>
+                        <option value="اللغة الإنكليزية">اللغة الإنكليزية</option>
+                        <option value="العلوم">العلوم</option>
+                        <option value="التربية الإسلامية">التربية الإسلامية</option>
+                        <option value="الدراسات الاجتماعية">الدراسات الاجتماعية</option>
+                        <option value="التربية الفنية">التربية الفنية</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">التاريخ</label>
-                    <input type="date" id="examDate" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">نوع التقييم</label>
+                    <select id="evalType" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium text-slate-800">
+                        <option value="مذاكرة">مذاكرة</option>
+                        <option value="امتحان">امتحان</option>
+                        <option value="اختبار قصير">اختبار قصير</option>
+                        <option value="تقييم شفوي">تقييم شفوي</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">التاريخ</label>
+                    <input type="date" id="examDate" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white font-medium text-slate-800">
                 </div>
             </div>
 
             <!-- Students Table Section -->
             <div>
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="text-sm sm:text-base font-semibold text-slate-800">الطلاب (<span id="studentCount">0</span>)</h2>
-                    <button onclick="addStudentRow()" class="px-2.5 py-1 bg-slate-100 active:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition">
-                        + إضافة طالب
+                <div class="flex justify-between items-center mb-2 px-1">
+                    <h2 class="text-sm sm:text-base font-bold text-slate-800">قائمة الطلاب المرصودة (<span id="studentCount" class="text-emerald-600 font-extrabold">0</span>)</h2>
+                    <button onclick="addStudentRow()" class="no-print px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl border border-emerald-200 transition">
+                        + إضافة طالب جديد
                     </button>
                 </div>
-                <!-- حاوية الجدول قابلة للتمرير برفق على الجوال -->
-                <div class="border border-slate-200 rounded-xl overflow-hidden max-h-[350px] overflow-y-auto bg-white">
-                    <table class="w-full text-right border-collapse">
-                        <thead class="bg-slate-100 text-slate-600 text-xs sticky top-0 z-10 shadow-sm">
+                
+                <!-- إزالة الارتفاع المحدد لضمان ظهور كامل القائمة بوضوح تام ودون اقتطاع -->
+                <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-inner bg-white">
+                    <table class="w-full text-right border-collapse print-table">
+                        <thead class="bg-slate-100 text-slate-700 text-xs sticky top-0 z-10 shadow-sm">
                             <tr>
-                                <th class="p-2.5 w-10 text-center">#</th>
-                                <th class="p-2.5">اسم الطالب</th>
-                                <th class="p-2.5 w-24 sm:w-28 text-center">العلامة</th>
-                                <th class="p-2.5 w-10 text-center">حذف</th>
+                                <th class="p-3 w-10 text-center">#</th>
+                                <th class="p-3">اسم الطالب</th>
+                                <th class="p-3 w-28 text-center">العلامة</th>
+                                <th class="no-print p-3 w-10 text-center">حذف</th>
                             </tr>
                         </thead>
                         <tbody id="studentsTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm">
@@ -67,25 +129,37 @@
             </div>
 
             <!-- Preview Box -->
-            <div>
-                <label class="block text-xs font-medium text-slate-700 mb-1">معاينة الرسالة</label>
-                <textarea id="messagePreview" readonly rows="5" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-mono focus:outline-none"></textarea>
+            <div class="no-print">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">معاينة الرسالة الجاهزة للإرسال الفوري</label>
+                <textarea id="messagePreview" readonly rows="5" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 font-mono focus:outline-none shadow-sm"></textarea>
             </div>
 
-            <!-- Action Button -->
-            <button onclick="sendToWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-medium py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm text-sm sm:text-base">
-                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                </svg>
-                إرسال عبر واتساب للمجموعة
-            </button>
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 no-print pt-1">
+                <button onclick="sendToWhatsAppDirect()" class="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-3.5 rounded-2xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 text-sm">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                    </svg>
+                    إرسال فوري للواتساب
+                </button>
+                <button onclick="exportToPDF()" class="bg-slate-800 hover:bg-slate-900 active:bg-black text-white font-bold py-3.5 rounded-2xl transition flex items-center justify-center gap-2 shadow-lg shadow-slate-800/20 text-sm">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                    تصدير ومشاركة PDF كامل
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('examDate').valueAsDate = new Date();
+        if(!localStorage.getItem('examDate')) {
+            document.getElementById('examDate').valueAsDate = new Date();
+        } else {
+            document.getElementById('examDate').value = localStorage.getItem('examDate');
+        }
 
-        let students = [
+        let defaultStudents = [
             "حمد اليوسف", "أحمد نجار", "براء القاسم", "بكر عبد الوهاب",
             "جمال فاعور", "حسين شرف الدين", "حمزة الشيخ", "حمزة بركاوي",
             "سعد الدين الناقوح", "صابر علوان", "عز الدين عبد الرزاق",
@@ -95,23 +169,33 @@
             "يوسف اليوسف", "ياسر يحيى", "يحيى محمود بركاوي", "يحيى زياد بركاوي"
         ];
 
+        let students = JSON.parse(localStorage.getItem('saved_students')) || defaultStudents;
+        let grades = JSON.parse(localStorage.getItem('saved_grades')) || {};
+
+        function saveData() {
+            localStorage.setItem('saved_students', JSON.stringify(students));
+            localStorage.setItem('saved_grades', JSON.stringify(grades));
+            localStorage.setItem('examDate', document.getElementById('examDate').value);
+        }
+
         function renderTable() {
             const tbody = document.getElementById('studentsTableBody');
             tbody.innerHTML = '';
             document.getElementById('studentCount').innerText = students.length;
             
             students.forEach((name, index) => {
+                const gradeVal = grades[index] || '';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td class="p-2 text-center text-slate-400 font-mono">${index + 1}</td>
-                    <td class="p-2">
-                        <input type="text" value="${name}" onchange="updateName(${index}, this.value)" class="w-full px-2 py-1.5 border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:outline-none bg-slate-50">
+                    <td class="p-3 text-center text-slate-400 font-mono text-xs">${index + 1}</td>
+                    <td class="p-3">
+                        <input type="text" value="${name}" onchange="updateName(${index}, this.value)" class="w-full px-2.5 py-1.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-emerald-500 focus:outline-none bg-slate-50 font-medium text-slate-800 text-xs sm:text-sm">
                     </td>
-                    <td class="p-2 text-center">
-                        <input type="text" placeholder="العلّامة" oninput="updatePreview()" class="student-grade w-20 sm:w-full px-2 py-1.5 border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:outline-none text-center font-bold bg-white">
+                    <td class="p-3 text-center">
+                        <input type="text" value="${gradeVal}" placeholder="العلّامة" oninput="updateGrade(${index}, this.value)" class="student-grade w-20 sm:w-full px-2 py-1.5 border border-slate-200 rounded-xl focus:ring-1 focus:ring-emerald-500 focus:outline-none text-center font-bold text-emerald-700 bg-emerald-50/40 text-xs sm:text-sm">
                     </td>
-                    <td class="p-2 text-center">
-                        <button onclick="removeStudent(${index})" class="text-red-400 hover:text-red-600 p-1">✕</button>
+                    <td class="no-print p-3 text-center">
+                        <button onclick="removeStudent(${index})" class="text-rose-400 hover:text-rose-600 p-1 transition">✕</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -119,37 +203,60 @@
             updatePreview();
         }
 
+        function updateName(index, value) {
+            students[index] = value;
+            saveData();
+            updatePreview();
+        }
+
+        function updateGrade(index, value) {
+            grades[index] = value;
+            saveData();
+            updatePreview();
+        }
+
         function addStudentRow() {
             students.push("طالب جديد");
             renderTable();
+            saveData();
         }
 
         function removeStudent(index) {
             students.splice(index, 1);
+            delete grades[index];
+            let newGrades = {};
+            students.forEach((_, i) => {
+                if (i >= index && grades[i+1]) newGrades[i] = grades[i+1];
+                else if (grades[i]) newGrades[i] = grades[i];
+            });
+            grades = newGrades;
             renderTable();
+            saveData();
         }
 
-        function updateName(index, value) {
-            students[index] = value;
-            updatePreview();
+        function resetData() {
+            if(confirm("هل تريد بالتأكيد مسح جميع العلامات وإعادة تعيين القائمة؟")) {
+                localStorage.clear();
+                students = [...defaultStudents];
+                grades = {};
+                renderTable();
+            }
         }
 
         function updatePreview() {
-            const subject = document.getElementById('subject').value || '................';
+            const subject = document.getElementById('subject').value;
             const evalType = document.getElementById('evalType').value;
             const examDate = document.getElementById('examDate').value;
             
+            document.getElementById('pdfHeaderMeta').innerText = `المادة: ${subject} | التقييم: ${evalType} | التاريخ: ${examDate} | عدد الطلاب: ${students.length}`;
+
             let text = `📌 علامات مادة (${subject})\n`;
             text += `📚 الصف الرابع الابتدائي (${evalType})\n`;
             text += `🗓️ التاريخ: ${examDate}\n`;
             text += `----------------------------\n`;
 
-            const rows = document.querySelectorAll('#studentsTableBody tr');
-            rows.forEach((row, idx) => {
-                const nameInput = row.querySelector('input[type="text"]');
-                const gradeInput = row.querySelector('.student-grade');
-                const name = nameInput ? nameInput.value : `طالب ${idx+1}`;
-                const grade = gradeInput && gradeInput.value.trim() !== '' ? gradeInput.value : '-';
+            students.forEach((name, idx) => {
+                const grade = grades[idx] && grades[idx].trim() !== '' ? grades[idx] : '-';
                 text += `${idx + 1}. ${name} : ${grade}\n`;
             });
 
@@ -159,15 +266,21 @@
             document.getElementById('messagePreview').value = text;
         }
 
-        document.getElementById('subject').addEventListener('input', updatePreview);
+        document.getElementById('subject').addEventListener('change', updatePreview);
         document.getElementById('evalType').addEventListener('change', updatePreview);
-        document.getElementById('examDate').addEventListener('change', updatePreview);
+        document.getElementById('examDate').addEventListener('change', () => { updatePreview(); saveData(); });
 
-        function sendToWhatsApp() {
+        function sendToWhatsAppDirect() {
+            updatePreview();
             const message = document.getElementById('messagePreview').value;
             const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
             window.open(whatsappUrl, '_blank');
+        }
+
+        function exportToPDF() {
+            updatePreview();
+            window.print();
         }
 
         renderTable();
