@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>نظام إرسال علامات الطلاب</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* تحسين التمرير وحجم الخطوط للهواتف */
+        input, select, textarea {
+            font-size: 16px !important; /* يمنع التكبير التلقائي المزعج في آيفون وأندرويد */
+        }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans min-h-screen p-2 sm:p-4">
+    <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <!-- Header -->
+        <div class="bg-emerald-600 text-white p-4 sm:p-5">
+            <h1 class="text-lg sm:text-xl font-bold">📊 رصد علامات الطلاب</h1>
+            <p class="text-emerald-100 text-xs sm:text-sm mt-0.5">الصف الرابع الابتدائي - واتساب</p>
+        </div>
+
+        <div class="p-3 sm:p-5 space-y-4">
+            <!-- Controls Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">المادة الدراسية</label>
+                    <input type="text" id="subject" placeholder="مثال: رياضيات" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">نوع التقييم</label>
+                    <select id="evalType" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                        <option value="مذاكرة">مذاكرة</option>
+                        <option value="امتحان">امتحان</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">التاريخ</label>
+                    <input type="date" id="examDate" class="w-full px-3 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                </div>
+            </div>
+
+            <!-- Students Table Section -->
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="text-sm sm:text-base font-semibold text-slate-800">الطلاب (<span id="studentCount">0</span>)</h2>
+                    <button onclick="addStudentRow()" class="px-2.5 py-1 bg-slate-100 active:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition">
+                        + إضافة طالب
+                    </button>
+                </div>
+                <!-- حاوية الجدول قابلة للتمرير برفق على الجوال -->
+                <div class="border border-slate-200 rounded-xl overflow-hidden max-h-[350px] overflow-y-auto bg-white">
+                    <table class="w-full text-right border-collapse">
+                        <thead class="bg-slate-100 text-slate-600 text-xs sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="p-2.5 w-10 text-center">#</th>
+                                <th class="p-2.5">اسم الطالب</th>
+                                <th class="p-2.5 w-24 sm:w-28 text-center">العلامة</th>
+                                <th class="p-2.5 w-10 text-center">حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody" class="divide-y divide-slate-100 text-xs sm:text-sm">
+                            <!-- Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Preview Box -->
+            <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">معاينة الرسالة</label>
+                <textarea id="messagePreview" readonly rows="5" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-mono focus:outline-none"></textarea>
+            </div>
+
+            <!-- Action Button -->
+            <button onclick="sendToWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-medium py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm text-sm sm:text-base">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                </svg>
+                إرسال عبر واتساب للمجموعة
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('examDate').valueAsDate = new Date();
+
+        let students = [
+            "حمد اليوسف", "أحمد نجار", "براء القاسم", "بكر عبد الوهاب",
+            "جمال فاعور", "حسين شرف الدين", "حمزة الشيخ", "حمزة بركاوي",
+            "سعد الدين الناقوح", "صابر علوان", "عز الدين عبد الرزاق",
+            "عبد الكريم الأطرش", "عبد الرحمن الإبراهيم", "علي العمر",
+            "عبدالله رشيد", "محمد فرزات", "محمد الإبراهيم", "مسلم طوبجو",
+            "المثنى الشيخ", "قسورة طهاري", "ياسر هدلة", "ياسر اليوسف",
+            "يوسف اليوسف", "ياسر يحيى", "يحيى محمود بركاوي", "يحيى زياد بركاوي"
+        ];
+
+        function renderTable() {
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = '';
+            document.getElementById('studentCount').innerText = students.length;
+            
+            students.forEach((name, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2 text-center text-slate-400 font-mono">${index + 1}</td>
+                    <td class="p-2">
+                        <input type="text" value="${name}" onchange="updateName(${index}, this.value)" class="w-full px-2 py-1.5 border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:outline-none bg-slate-50">
+                    </td>
+                    <td class="p-2 text-center">
+                        <input type="text" placeholder="العلّامة" oninput="updatePreview()" class="student-grade w-20 sm:w-full px-2 py-1.5 border border-slate-200 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:outline-none text-center font-bold bg-white">
+                    </td>
+                    <td class="p-2 text-center">
+                        <button onclick="removeStudent(${index})" class="text-red-400 hover:text-red-600 p-1">✕</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updatePreview();
+        }
+
+        function addStudentRow() {
+            students.push("طالب جديد");
+            renderTable();
+        }
+
+        function removeStudent(index) {
+            students.splice(index, 1);
+            renderTable();
+        }
+
+        function updateName(index, value) {
+            students[index] = value;
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const subject = document.getElementById('subject').value || '................';
+            const evalType = document.getElementById('evalType').value;
+            const examDate = document.getElementById('examDate').value;
+            
+            let text = `📌 علامات مادة (${subject})\n`;
+            text += `📚 الصف الرابع الابتدائي (${evalType})\n`;
+            text += `🗓️ التاريخ: ${examDate}\n`;
+            text += `----------------------------\n`;
+
+            const rows = document.querySelectorAll('#studentsTableBody tr');
+            rows.forEach((row, idx) => {
+                const nameInput = row.querySelector('input[type="text"]');
+                const gradeInput = row.querySelector('.student-grade');
+                const name = nameInput ? nameInput.value : `طالب ${idx+1}`;
+                const grade = gradeInput && gradeInput.value.trim() !== '' ? gradeInput.value : '-';
+                text += `${idx + 1}. ${name} : ${grade}\n`;
+            });
+
+            text += `----------------------------\n`;
+            text += `مع تمنياتنا لجميع الطلاب دوام التفوق والنجاح 🌟`;
+
+            document.getElementById('messagePreview').value = text;
+        }
+
+        document.getElementById('subject').addEventListener('input', updatePreview);
+        document.getElementById('evalType').addEventListener('change', updatePreview);
+        document.getElementById('examDate').addEventListener('change', updatePreview);
+
+        function sendToWhatsApp() {
+            const message = document.getElementById('messagePreview').value;
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        renderTable();
+    </script>
+</body>
+</html>
